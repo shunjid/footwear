@@ -16,7 +16,13 @@
               </p>
             </div>
             <div class="card-action">
-              <a href="#">Add to cart</a>
+              <a
+                class="btn btn-small waves-effect waves-light deep-orange"
+                id="add-to-cart"
+                @click="addToCart"
+                v-if="!showSuccessMessage"
+                >Add to cart</a
+              >
             </div>
           </div>
         </div>
@@ -29,14 +35,30 @@
 <script>
 import axios from "axios";
 import NotFoundPage from "./NotFoundPage.vue";
+import M from "materialize-css";
 
 export default {
   components: { NotFoundPage },
   name: "ProductDetailsPage",
   data() {
     return {
-      product: []
+      product: {},
+      showSuccessMessage: false
     };
+  },
+  methods: {
+    async addToCart() {
+      await axios.post("/api/users/12345/cart", {
+        productId: this.$route.params.id
+      });
+      this.showSuccessMessage = true;
+
+      M.toast({ html: "Added item to cart !", classes: "rounded" });
+
+      setTimeout(() => {
+        this.$router.push("/products");
+      }, 1500);
+    }
   },
   async created() {
     const result = await axios.get(`/api/products/${this.$route.params.id}`);
