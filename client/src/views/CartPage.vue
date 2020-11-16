@@ -8,16 +8,21 @@
 </template>
 
 <script>
+import axios from "axios";
 import CartCollection from "../components/CartCollection.vue";
-import { cartItems } from "../fake-data";
 
 export default {
   components: { CartCollection },
   name: "CartPage",
   data() {
     return {
-      cartItems
+      cartItems: []
     };
+  },
+  async created() {
+    const result = await axios.get("/api/users/12345/cart");
+    const cartItems = result.data;
+    this.cartItems = cartItems;
   }
 };
 </script>
