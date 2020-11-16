@@ -3,6 +3,7 @@
     <ul class="collection">
       <CartCollectionItem
         v-for="product in cartItems"
+        v-on:remove-from-cart="$emit('remove-from-cart', $event)"
         :key="product.id"
         :product="product"
       />
