@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import CartPage from "../views/CartPage.vue";
 import ProductDetailsPage from "../views/ProductDetailsPage.vue";
 import ProductsPage from "../views/ProductsPage.vue";
+import NotFoundPage from "../views/NotFoundPage.vue";
 
 const routes = [
   {
@@ -22,6 +23,10 @@ const routes = [
   {
     path: "/",
     redirect: "/products"
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    component: NotFoundPage
   }
 ];
 
