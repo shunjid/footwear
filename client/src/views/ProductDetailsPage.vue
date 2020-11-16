@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="product">
     <div class="row">
       <div class="col l12 s12">
         <h2 class="header">{{ product.name }}</h2>
@@ -23,12 +23,15 @@
       </div>
     </div>
   </div>
+  <NotFoundPage v-else />
 </template>
 
 <script>
 import { products } from "../fake-data";
+import NotFoundPage from "./NotFoundPage.vue";
 
 export default {
+  components: { NotFoundPage },
   name: "ProductDetailsPage",
   data() {
     return {
