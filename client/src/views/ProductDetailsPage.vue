@@ -20,8 +20,13 @@
                 class="btn btn-small waves-effect waves-light deep-orange"
                 id="add-to-cart"
                 @click="addToCart"
-                v-if="!showSuccessMessage"
-                >Add to cart</a
+                v-if="!isItemInCartAlready && !showSuccessMessage"
+              >
+                <i class="material-icons left">add_shopping_cart</i>
+                Add to cart</a
+              >
+              <a class="btn btn-small disabled" v-if="isItemInCartAlready"
+                >Item is already in Cart !</a
               >
             </div>
           </div>
@@ -43,8 +48,14 @@ export default {
   data() {
     return {
       product: {},
+      cartItems: [],
       showSuccessMessage: false
     };
+  },
+  computed: {
+    isItemInCartAlready() {
+      return this.cartItems.some(item => item.id === this.product.id);
+    }
   },
   methods: {
     async addToCart() {
@@ -61,9 +72,13 @@ export default {
     }
   },
   async created() {
-    const result = await axios.get(`/api/products/${this.$route.params.id}`);
-    const product = result.data;
+    const { data: product } = await axios.get(
+      `/api/products/${this.$route.params.id}`
+    );
     this.product = product;
+
+    const { data: cartItems } = await axios.get("/api/users/12345/cart");
+    this.cartItems = cartItems;
   }
 };
 </script>
