@@ -18,24 +18,33 @@ app.use(
 
 app.use(history());
 
+const dbUrl =
+  process.env.MONGO_USER && process.env.MONGO_PASS
+    ? `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@freecluster.tpabx.mongodb.net/${process.env.MONGO_DBNAME}?retryWrites=true&w=majority`
+    : "mongodb://localhost:27017";
+
+const dbName = process.env.MONGO_DBNAME || "footwear-db";
+
+// GET: Get all products
 app.get("/api/products", async (req, res) => {
-  const client = await MongoClient.connect("mongodb://localhost:27017", {
+  const client = await MongoClient.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = client.db("footwear-db");
+  const db = client.db(dbName);
   const products = await db.collection("products").find({}).toArray();
 
   res.status(200).json(products);
   client.close();
 });
 
+// GET: Get all cart items
 app.get("/api/users/:userId/cart", async (req, res) => {
-  const client = await MongoClient.connect("mongodb://localhost:27017", {
+  const client = await MongoClient.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = client.db("footwear-db");
+  const db = client.db(dbName);
   const { userId } = req.params;
   const user = await db.collection("users").findOne({
     id: userId,
@@ -53,13 +62,14 @@ app.get("/api/users/:userId/cart", async (req, res) => {
   client.close();
 });
 
+// GET: Get specific product details
 app.get("/api/products/:productId", async (req, res) => {
   const { productId } = req.params;
-  const client = await MongoClient.connect("mongodb://localhost:27017", {
+  const client = await MongoClient.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = client.db("footwear-db");
+  const db = client.db(dbName);
 
   const product = await db.collection("products").findOne({
     id: productId,
@@ -73,16 +83,16 @@ app.get("/api/products/:productId", async (req, res) => {
   client.close();
 });
 
-// Cart items for a user
+// POST: Add a cart item for a user
 app.post("/api/users/:userId/cart", async (req, res) => {
   const { productId } = req.body;
   const { userId } = req.params;
 
-  const client = await MongoClient.connect("mongodb://localhost:27017", {
+  const client = await MongoClient.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = client.db("footwear-db");
+  const db = client.db(dbName);
 
   await db.collection("users").updateOne(
     {
@@ -108,12 +118,13 @@ app.post("/api/users/:userId/cart", async (req, res) => {
   client.close();
 });
 
+// DELETE: Delete a cart item for a user
 app.delete("/api/users/:userId/cart/:productId", async (req, res) => {
-  const client = await MongoClient.connect("mongodb://localhost:27017", {
+  const client = await MongoClient.connect(dbUrl, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
   });
-  const db = client.db("footwear-db");
+  const db = client.db(dbName);
 
   const { userId, productId } = req.params;
 
@@ -142,6 +153,6 @@ app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "../dist/index.html"));
 });
 
-app.listen(8000, () => {
+app.listen(process.env.PORT || 8000, () => {
   console.log("Server is listening to port 8000");
 });
